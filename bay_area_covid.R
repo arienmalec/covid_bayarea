@@ -8,7 +8,7 @@ six_counties <-
 	"Alameda","Contra Costa", "San Mateo")
 
 sixcty <-
-	read_csv("./data/covid-19-data/us-counties.csv") %>%
+	read_csv("./covid-19-data/us-counties.csv") %>%
 	filter(state == "California") %>%
 	filter(date >= "2020-03-01") %>%
 	filter(county %in% six_counties) %>%

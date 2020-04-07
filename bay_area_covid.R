@@ -27,7 +27,7 @@ nyc <-
 		date > "2020-03-29" ~ "shelter+2w",
 		TRUE				~ "shelter")) %>%
 	select(date, period, cases, deaths, county)
-factor(sixcty$period)
+factor(nyc$period)
 
 la <- 
 	read_csv("./covid-19-data/us-counties.csv") %>%
@@ -38,7 +38,7 @@ la <-
 		date > "2020-03-29" ~ "shelter+2w",
 		TRUE				~ "shelter")) %>%
 	select(date, period, cases, deaths, county)
-factor(sixcty$period)
+factor(la$period)
 
 
 all_six_cty <- sixcty %>%

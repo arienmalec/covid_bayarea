@@ -42,6 +42,8 @@ The following objects are masked from ‘package:base’:
 + 		date >= "2020-03-16" & date < "2020-04-01" ~ "Mar 2H",
 + 		date >= "2020-04-01" & date < "2020-04-16" ~ "Apr 1H",
 + 		date >= "2020-04-16" & date < "2020-05-01" ~ "Apr 2H",
++ 		date >= "2020-05-01" & date < "2020-05-16" ~ "May 1H",
++ 		date >= "2020-05-16" & date < "2020-05-01" ~ "May 2H",
 + 		TRUE				~ "ERROR"))
 + }
 > 
@@ -102,10 +104,11 @@ cols(
 [331] Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H
 [341] Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H
 [351] Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H
-[361] Apr 2H Apr 2H Apr 2H ERROR  ERROR  ERROR  ERROR  ERROR  ERROR  ERROR 
-[371] ERROR  ERROR  ERROR  ERROR  ERROR  ERROR  ERROR  ERROR  ERROR  ERROR 
-[381] ERROR 
-Levels: Apr 1H Apr 2H ERROR Mar 1H Mar 2H
+[361] Apr 2H Apr 2H Apr 2H May 1H May 1H May 1H May 1H May 1H May 1H May 1H
+[371] May 1H May 1H May 1H May 1H May 1H May 1H May 1H May 1H May 1H May 1H
+[381] May 1H May 1H May 1H May 1H May 1H May 1H May 1H May 1H May 1H May 1H
+[391] May 1H May 1H May 1H
+Levels: Apr 1H Apr 2H Mar 1H Mar 2H May 1H
 > 
 > nyc <-
 + 	read_csv("./covid-19-data/us-counties.csv") %>%
@@ -132,8 +135,8 @@ cols(
 [31] Mar 2H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H
 [41] Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 2H Apr 2H Apr 2H Apr 2H
 [51] Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H
-[61] Apr 2H ERROR  ERROR  ERROR 
-Levels: Apr 1H Apr 2H ERROR Mar 1H Mar 2H
+[61] Apr 2H May 1H May 1H May 1H May 1H May 1H
+Levels: Apr 1H Apr 2H Mar 1H Mar 2H May 1H
 > 
 > la <- 
 + 	read_csv("./covid-19-data/us-counties.csv") %>%
@@ -161,8 +164,8 @@ cols(
 [31] Mar 2H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H
 [41] Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 1H Apr 2H Apr 2H Apr 2H Apr 2H
 [51] Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H Apr 2H
-[61] Apr 2H ERROR  ERROR  ERROR 
-Levels: Apr 1H Apr 2H ERROR Mar 1H Mar 2H
+[61] Apr 2H May 1H May 1H May 1H May 1H May 1H
+Levels: Apr 1H Apr 2H Mar 1H Mar 2H May 1H
 > 
 > 
 > all_six_cty <- sixcty %>%
@@ -332,4 +335,4 @@ null device
 > 
 > proc.time()
    user  system elapsed 
-  6.376   0.620   7.949 
+ 10.649   1.231  14.071 

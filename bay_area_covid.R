@@ -3,17 +3,18 @@ library(ggplot2)
 library(dplyr)
 library(ggthemes)
 
+periods <- c("Mar 1H", "Mar 2H", "Apr 1H", "Apr 2H", "May 1H", "May 2H", "June 1H", "June 2H")
 
 assign_periods <- function(d) {
     mutate(d, period = case_when(
-        date < "2020-03-16" ~ "Mar 1H",
-        date >= "2020-03-16" & date < "2020-04-01" ~ "Mar 2H",
-        date >= "2020-04-01" & date < "2020-04-16" ~ "Apr 1H",
-        date >= "2020-04-16" & date < "2020-05-01" ~ "Apr 2H",
-        date >= "2020-05-01" & date < "2020-05-16" ~ "May 1H",
-        date >= "2020-05-16" & date < "2020-06-01" ~ "May 2H",
-        date >= "2020-06-01" & date < "2020-06-16" ~ "June 1H",
-        date >= "2020-06-16" & date < "2020-07-01" ~ "June 2H",
+        date < "2020-03-16" ~ periods[1],
+        date >= "2020-03-16" & date < "2020-04-01" ~ periods[2],
+        date >= "2020-04-01" & date < "2020-04-16" ~ periods[3],
+        date >= "2020-04-16" & date < "2020-05-01" ~ periods[4],
+        date >= "2020-05-01" & date < "2020-05-16" ~ periods[5],
+        date >= "2020-05-16" & date < "2020-06-01" ~ periods[6],
+        date >= "2020-06-01" & date < "2020-06-16" ~ periods[7],
+        date >= "2020-06-16" & date < "2020-07-01" ~ periods[8],
         TRUE ~ "ERROR"
     ))
 }
@@ -31,7 +32,7 @@ sixcty <-
     filter(date >= "2020-03-01") %>%
     assign_periods() %>%
     select(date, period, cases, deaths, county)
-factor(sixcty$period)
+factor(sixcty$period, levels = periods)
 
 nyc <-
     read_csv("./covid-19-data/us-counties.csv") %>%
@@ -42,7 +43,7 @@ nyc <-
 
 nyc$new_cases <- nyc$cases - lag(nyc$cases, default = 0)
 nyc$new_deaths <- nyc$deaths - lag(nyc$deaths, default = 0)
-factor(nyc$period)
+factor(nyc$period, levels = periods)
 
 la <-
     read_csv("./covid-19-data/us-counties.csv") %>%
@@ -54,26 +55,31 @@ la <-
 
 la$new_cases <- la$cases - lag(la$cases, default = 0)
 la$new_deaths <- la$deaths - lag(la$deaths, default = 0)
-factor(la$period)
+factor(la$period, levels = periods)
+
 
 
 all_six_cty <- sixcty %>%
     group_by(date, period) %>%
     summarize(cases = sum(cases), deaths = sum(deaths)) %>%
     mutate(county = "Bay Area Six-County Region")
+factor(all_six_cty$period, levels = periods)
 
 all_six_cty$new_cases <- all_six_cty$cases - lag(all_six_cty$cases, default = 0)
 all_six_cty$new_deaths <- all_six_cty$deaths - lag(all_six_cty$deaths, default = 0)
 
 
 nyc_la_bayarea <- bind_rows(nyc, la, all_six_cty)
+factor(nyc_la_bayarea$period, levels = periods)
 
 p_case_sm <-
     ggplot(sixcty, aes(x = date, y = cases, fill = period, color = county)) +
     geom_point() +
     geom_smooth(method = lm) +
     scale_y_log10() +
-    ggtitle("COVID-19 Case Totals by County for Bay Area 6-County Region", subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)") +
+    ggtitle("COVID-19 Case Totals by County for Bay Area 6-County Region",
+        subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)"
+    ) +
     theme_few()
 
 p_death_sm <-
@@ -81,7 +87,9 @@ p_death_sm <-
     geom_smooth(method = lm) +
     geom_point() +
     scale_y_log10() +
-    ggtitle("COVID-19 Death Totals by County for Bay Area 6-County Region", subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)") +
+    ggtitle("COVID-19 Death Totals by County for Bay Area 6-County Region",
+        subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)"
+    ) +
     theme_few()
 
 p_all_cases <-
@@ -89,7 +97,9 @@ p_all_cases <-
     geom_point() +
     geom_smooth(method = lm) +
     scale_y_log10(labels = scales::comma) +
-    ggtitle("COVID-19 Case Totals for Bay Area 6-Country Region", subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)") +
+    ggtitle("COVID-19 Case Totals for Bay Area 6-Country Region",
+        subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)"
+    ) +
     theme_few()
 
 p_all_deaths <-
@@ -97,7 +107,9 @@ p_all_deaths <-
     geom_point() +
     geom_smooth(method = lm) +
     scale_y_log10(labels = scales::comma) +
-    ggtitle("COVID-19 Death Totals for Bay Area 6-Country Region", subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)") +
+    ggtitle("COVID-19 Death Totals for Bay Area 6-Country Region",
+        subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)"
+    ) +
     theme_few()
 
 p_bay_la_nyc_deaths <-
@@ -105,7 +117,9 @@ p_bay_la_nyc_deaths <-
     geom_point() +
     geom_smooth(method = lm) +
     scale_y_log10(labels = scales::comma) +
-    ggtitle("COVID-19 Death Totals for Bay Area 6-Country Region, LA & NYC", subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)") +
+    ggtitle("COVID-19 Death Totals for Bay Area 6-Country Region, LA & NYC",
+        subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)"
+    ) +
     theme_few()
 
 p_bay_la_nyc_cases <-
@@ -113,7 +127,9 @@ p_bay_la_nyc_cases <-
     geom_point() +
     geom_smooth(method = lm) +
     scale_y_log10(labels = scales::comma) +
-    ggtitle("COVID-19 Case Totals for Bay Area 6-Country Region, LA & NYC", subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)") +
+    ggtitle("COVID-19 Case Totals for Bay Area 6-Country Region, LA & NYC",
+        subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)"
+    ) +
     theme_few()
 
 p_bay_la_nyc_new_cases <-
@@ -121,15 +137,30 @@ p_bay_la_nyc_new_cases <-
     geom_point() +
     geom_smooth(method = lm) +
     scale_y_log10(labels = scales::comma) +
-    ggtitle("COVID-19 New Cases By Day for Bay Area 6-Country Region, LA & NYC", subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)") +
+    ggtitle("COVID-19 New Cases By Day for Bay Area 6-Country Region, LA & NYC",
+        subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)"
+    ) +
     theme_few()
+
+p_bay_la_nyc_new_cases_linear <-
+    ggplot(nyc_la_bayarea, aes(x = date, y = new_cases, color = county, fill = period)) +
+    geom_point() +
+    geom_smooth(method = lm) +
+    scale_y_continuous(labels = scales::comma) +
+    ggtitle("COVID-19 New Cases By Day for Bay Area 6-Country Region, LA & NYC",
+        subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)"
+    ) +
+    theme_few()
+
 
 p_bay_la_nyc_new_deaths <-
     ggplot(nyc_la_bayarea, aes(x = date, y = new_deaths, color = county, fill = period)) +
     geom_point() +
     geom_smooth(method = lm) +
     scale_y_log10(labels = scales::comma) +
-    ggtitle("COVID-19 New Deaths By Day for Bay Area 6-Country Region, LA & NYC", subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)") +
+    ggtitle("COVID-19 New Deaths By Day for Bay Area 6-Country Region, LA & NYC",
+        subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)"
+    ) +
     theme_few()
 
 
@@ -164,6 +195,11 @@ dev.off()
 png("~/Desktop/bay_area_la_nyc_covid_new_cases.png")
 print(p_bay_la_nyc_new_cases)
 dev.off()
+
+png("~/Desktop/bay_area_la_nyc_covid_new_cases_linear.png")
+print(p_bay_la_nyc_new_cases_linear)
+dev.off()
+
 
 png("~/Desktop/bay_area_la_nyc_covid_new_deaths.png")
 print(p_bay_la_nyc_new_deaths)

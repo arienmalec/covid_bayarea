@@ -1,2 +1,3 @@
 .RData
-bay_area_covid.Rout
+*.Rout
+*.csv

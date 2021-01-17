@@ -3,22 +3,6 @@ library(ggplot2)
 library(dplyr)
 library(ggthemes)
 
-periods <- c("Mar 1H", "Mar 2H", "Apr 1H", "Apr 2H", "May 1H", "May 2H", "June 1H", "June 2H")
-
-assign_periods <- function(d) {
-    mutate(d, period = case_when(
-        date < "2020-03-16" ~ periods[1],
-        date >= "2020-03-16" & date < "2020-04-01" ~ periods[2],
-        date >= "2020-04-01" & date < "2020-04-16" ~ periods[3],
-        date >= "2020-04-16" & date < "2020-05-01" ~ periods[4],
-        date >= "2020-05-01" & date < "2020-05-16" ~ periods[5],
-        date >= "2020-05-16" & date < "2020-06-01" ~ periods[6],
-        date >= "2020-06-01" & date < "2020-06-16" ~ periods[7],
-        date >= "2020-06-16" & date < "2020-07-01" ~ periods[8],
-        TRUE ~ "ERROR"
-    ))
-}
-
 six_counties <-
     c(
         "Santa Clara", "San Francisco", "Marin",
@@ -26,13 +10,21 @@ six_counties <-
     )
 
 sixcty <-
-    read_csv("./covid-19-data/us-counties.csv") %>%
+    read_csv("https://github.com/nytimes/covid-19-data/raw/master/us-counties.csv") %>%
     filter(state == "California") %>%
     filter(county %in% six_counties) %>%
     filter(date >= "2020-03-01") %>%
-    assign_periods() %>%
-    select(date, period, cases, deaths, county)
-factor(sixcty$period, levels = periods)
+    select(date, cases, deaths, county)
+
+all_six_cty <- sixcty %>%
+    group_by(date) %>%
+    summarize(cases = sum(cases), deaths = sum(deaths)) %>%
+    mutate(county = "Bay Area Six-County Region")
+
+all_six_cty$new_cases <- all_six_cty$cases - lag(all_six_cty$cases, default = 0)
+all_six_cty$new_deaths <- all_six_cty$deaths - lag(all_six_cty$deaths, default = 0)
+
+
 
 nyc <-
     read_csv("./covid-19-data/us-counties.csv") %>%
@@ -162,6 +154,20 @@ p_bay_la_nyc_new_deaths <-
         subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)"
     ) +
     theme_few()
+
+p_all_new_cases <- 
+    ggplot(all_six_cty, aes(x=date, y=new_cases)) +
+    geom_point() +
+    scale_y_log10(labels = scales::comma) +
+    scale_x_date(
+        date_breaks = "1 month",
+        date_minor_breaks = "1 week",
+        date_labels="%B") +
+    ggtitle("COVID-19 New Cases By Day for Bay Area 6-Country Region",
+        subtitle = "Data from NYT (https://github.com/nytimes/covid-19-data.git)"
+    ) +
+    theme_few() +
+    theme(axis.text.x=element_text(angle=60, hjust=1))
 
 
 png("~/Desktop/bay_area_covid_by_cty.png")
